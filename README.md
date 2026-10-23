@@ -1,159 +1,100 @@
 
+# Class Diagram — ورکینو
 
-# Class Specification — Workino
+## ۱. مقدمه
 
-## 1. User
+این دیاگرام کلاس‌های اصلی سیستم ورکینو، ویژگی‌های آن‌ها و روابط بین آن‌ها را نشان می‌دهد.
 
-**Type:** Abstract Class
+## ۲. کلاس‌ها
 
-The base class for all system users. It stores the information shared by customers, specialists, and admins.
-
-| Attribute | Type | Description |
-|---|---|---|
-| `userId` | `int` | User identifier |
-| `fullName` | `string` | Full name |
-| `email` | `string` | User email |
-| `phone` | `string` | Phone number |
-| `passwordHash` | `string` | Hashed password |
-| `isActive` | `bool` | Account status |
-
-| Operation | Description |
+### ۲.۱ User
+| ویژگی | نوع |
 |---|---|
-| `register()` | Registers a user |
-| `login()` | Logs in to the account |
-| `updateProfile()` | Updates common user information |
+| id | int |
+| full_name | string |
+| email | string |
+| phone | string |
+| password_hash | string |
+| is_active | bool |
 
-## 2. Customer
-
-A customer searches for services and submits service requests.
-
-| Attribute | Type | Description |
-|---|---|---|
-| `address` | `string` | Customer address |
-
-| Operation | Description |
+### ۲.۲ Customer
+| ویژگی | نوع |
 |---|---|
-| `viewRequests()` | Views previous requests |
-| `submitRequest()` | Submits a service request |
-| `reviewSpecialist()` | Submits a rating and review |
+| address | string |
 
-**Relationships:** Inherits from `User`. A customer can submit multiple service requests and write multiple reviews.
-
-## 3. Specialist
-
-A specialist provides services, handles requests, and manages professional information.
-
-| Attribute | Type | Description |
-|---|---|---|
-| `bio` | `string` | Specialist introduction |
-| `skills` | `string` | Skills and expertise |
-| `serviceArea` | `string` | Service location or area |
-| `estimatedRate` | `decimal` | Estimated service rate |
-
-| Operation | Description |
+### ۲.۳ Specialist
+| ویژگی | نوع |
 |---|---|
-| `viewRequests()` | Views service requests |
-| `acceptRequest()` | Accepts a request |
-| `rejectRequest()` | Rejects a request |
-| `updateProfile()` | Updates professional information |
+| bio | string |
+| skills | string |
+| service_area | string |
+| estimated_rate | decimal |
 
-**Relationships:** Inherits from `User`. A specialist can offer services in multiple categories, handle multiple requests, receive reviews, and manage availability slots.
+### ۲.۴ Admin
 
-## 4. Admin
+ویژگی‌های این کلاس از کلاس `User` به ارث می‌رسند.
 
-The admin manages user accounts and service categories and monitors the system.
-
-| Operation | Description |
+### ۲.۵ ServiceCategory
+| ویژگی | نوع |
 |---|---|
-| `manageUsers()` | Manages customer and specialist accounts |
-| `manageCategories()` | Manages service categories |
-| `viewStatistics()` | Views system statistics |
+| id | int |
+| name | string |
+| description | string |
 
-**Relationships:** Inherits from `User` and works with the relevant classes to manage accounts and categories.
-
-## 5. ServiceCategory
-
-Represents a category of services, such as repairs, cleaning, or technical services.
-
-| Attribute | Type | Description |
-|---|---|---|
-| `categoryId` | `int` | Category identifier |
-| `name` | `string` | Category name |
-| `description` | `string` | Category description |
-
-| Operation | Description |
+### ۲.۶ ServiceRequest
+| ویژگی | نوع |
 |---|---|
-| `addCategory()` | Adds a category |
-| `updateCategory()` | Updates a category |
+| id | int |
+| customer_id | int |
+| specialist_id | int |
+| category_id | int |
+| description | string |
+| location | string |
+| budget | decimal |
+| requested_at | datetime |
+| status | RequestStatus |
 
-**Relationships:** A category can contain multiple service requests. Each request belongs to one category. A specialist can offer services in multiple categories.
-
-## 6. ServiceRequest
-
-Stores the details and status of a customer's service request.
-
-| Attribute | Type | Description |
-|---|---|---|
-| `requestId` | `int` | Request identifier |
-| `description` | `string` | Description of the required service |
-| `location` | `string` | Service location |
-| `budget` | `decimal` | Customer's proposed budget |
-| `requestedAt` | `DateTime` | Request creation time |
-| `status` | `RequestStatus` | Current request status |
-
-| Operation | Description |
+### ۲.۷ Review
+| ویژگی | نوع |
 |---|---|
-| `updateStatus()` | Updates the request status |
-| `cancelRequest()` | Cancels the request |
+| id | int |
+| customer_id | int |
+| specialist_id | int |
+| request_id | int |
+| rating | int |
+| comment | string |
+| created_at | datetime |
 
-**Relationships:** Each request belongs to one customer and one service category. A request can have no assigned specialist or one assigned specialist. A completed request can have one review.
-
-## 7. Review
-
-Stores a customer's rating and feedback about a specialist. This is an optional feature.
-
-| Attribute | Type | Description |
-|---|---|---|
-| `reviewId` | `int` | Review identifier |
-| `rating` | `int` | Rating given by the customer |
-| `comment` | `string` | Review text |
-| `createdAt` | `DateTime` | Review creation time |
-
-| Operation | Description |
+### ۲.۸ AvailabilitySlot
+| ویژگی | نوع |
 |---|---|
-| `submitReview()` | Submits a review |
-| `updateReview()` | Updates a review |
+| id | int |
+| specialist_id | int |
+| start_time | datetime |
+| end_time | datetime |
+| is_available | bool |
 
-**Relationships:** Each review is written by one customer, belongs to one specialist, and is associated with one completed service request.
-
-## 8. AvailabilitySlot
-
-Stores the time periods when a specialist is available. This is an optional feature.
-
-| Attribute | Type | Description |
-|---|---|---|
-| `slotId` | `int` | Time slot identifier |
-| `startTime` | `DateTime` | Start time |
-| `endTime` | `DateTime` | End time |
-| `isAvailable` | `bool` | Availability status |
-
-| Operation | Description |
+### ۲.۹ RequestStatus (enum)
+| مقدار | توضیح |
 |---|---|
-| `setAvailability()` | Sets the availability status |
+| PENDING | در انتظار پاسخ متخصص |
+| ACCEPTED | پذیرفته‌شده |
+| REJECTED | ردشده |
+| COMPLETED | تکمیل‌شده |
+| CANCELLED | لغوشده |
 
-**Relationships:** Each availability slot belongs to one specialist. A specialist can have multiple availability slots.
+## ۳. روابط
 
-## 9. RequestStatus
+- `User` ← `Customer` (ارث‌بری)
+- `User` ← `Specialist` (ارث‌بری)
+- `User` ← `Admin` (ارث‌بری)
+- `Customer 1:N ServiceRequest`
+- `Specialist 1:N ServiceRequest`
+- `ServiceCategory 1:N ServiceRequest`
+- `Customer 1:N Review`
+- `Specialist 1:N Review`
+- `ServiceRequest 1:0..1 Review`
+- `Specialist 1:N AvailabilitySlot`
+- `Specialist N:M ServiceCategory`
 
-An enumeration used by `ServiceRequest` to represent the possible states of a request.
-
-| Value | Description |
-|---|---|
-| `PENDING` | Waiting for review |
-| `ACCEPTED` | Accepted by a specialist |
-| `REJECTED` | Rejected by a specialist |
-| `IN_PROGRESS` | Service is in progress |
-| `COMPLETED` | Service is completed |
-| `CANCELLED` | Request is cancelled |
-
-`RequestStatus` is an enumeration, not a regular class.
+نکته: `specialist_id` در درخواست می‌تواند خالی باشد؛ چون درخواست ممکن است هنوز به متخصصی تخصیص داده نشده باشد. `RequestStatus` نیز یک `enum` است، نه یک کلاس معمولی.
