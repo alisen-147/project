@@ -1,100 +1,59 @@
 
-# Class Diagram — ورکینو
+# Class Specification — ورکینو
 
-## ۱. مقدمه
-
-این دیاگرام کلاس‌های اصلی سیستم ورکینو، ویژگی‌های آن‌ها و روابط بین آن‌ها را نشان می‌دهد.
-
-## ۲. کلاس‌ها
-
-### ۲.۱ User
-| ویژگی | نوع |
+## Customer
+| بخش | توضیح |
 |---|---|
-| id | int |
-| full_name | string |
-| email | string |
-| phone | string |
-| password_hash | string |
-| is_active | bool |
+| مسئولیت | ثبت درخواست خدمات و پیگیری آن‌ها |
+| ویژگی‌ها | id, full_name, email, phone, password_hash, address, is_active |
+| متدها | register(), login(), logout(), createRequest(), viewRequests(), submitReview() |
+| روابط | Customer 1:N ServiceRequest، Customer 1:N Review |
 
-### ۲.۲ Customer
-| ویژگی | نوع |
+## Specialist
+| بخش | توضیح |
 |---|---|
-| address | string |
+| مسئولیت | ارائه خدمات و مدیریت درخواست‌های دریافتی |
+| ویژگی‌ها | id, full_name, email, phone, password_hash, bio, skills, service_area, estimated_rate, is_active |
+| متدها | register(), login(), logout(), viewRequests(), acceptRequest(), rejectRequest(), updateProfile() |
+| روابط | Specialist 1:N ServiceRequest، Specialist 1:N Review، Specialist 1:N AvailabilitySlot |
 
-### ۲.۳ Specialist
-| ویژگی | نوع |
+## Admin
+| بخش | توضیح |
 |---|---|
-| bio | string |
-| skills | string |
-| service_area | string |
-| estimated_rate | decimal |
+| مسئولیت | مدیریت کاربران و دسته‌بندی خدمات |
+| ویژگی‌ها | id, full_name, email, password_hash, is_active |
+| متدها | login(), logout(), manageUsers(), manageCategories(), viewStatistics() |
+| روابط | مدیریت Customer، Specialist و ServiceCategory |
 
-### ۲.۴ Admin
-
-ویژگی‌های این کلاس از کلاس `User` به ارث می‌رسند.
-
-### ۲.۵ ServiceCategory
-| ویژگی | نوع |
+## ServiceCategory
+| بخش | توضیح |
 |---|---|
-| id | int |
-| name | string |
-| description | string |
+| مسئولیت | دسته‌بندی خدمات قابل ارائه |
+| ویژگی‌ها | id, name, description |
+| متدها | addCategory(), updateCategory(), deleteCategory() |
+| روابط | ServiceCategory 1:N ServiceRequest، ارتباط N:M با Specialist |
 
-### ۲.۶ ServiceRequest
-| ویژگی | نوع |
+## ServiceRequest
+| بخش | توضیح |
 |---|---|
-| id | int |
-| customer_id | int |
-| specialist_id | int |
-| category_id | int |
-| description | string |
-| location | string |
-| budget | decimal |
-| requested_at | datetime |
-| status | RequestStatus |
+| مسئولیت | نگهداری و پیگیری درخواست‌های خدمات |
+| ویژگی‌ها | id, customer_id, specialist_id, category_id, description, location, budget, requested_at, status |
+| متدها | assignSpecialist(), updateStatus(), cancelRequest() |
+| روابط | ارتباط با Customer، Specialist و ServiceCategory؛ امکان ثبت Review |
+| وضعیت‌ها | PENDING، ACCEPTED، REJECTED، COMPLETED، CANCELLED |
 
-### ۲.۷ Review
-| ویژگی | نوع |
+## Review
+| بخش | توضیح |
 |---|---|
-| id | int |
-| customer_id | int |
-| specialist_id | int |
-| request_id | int |
-| rating | int |
-| comment | string |
-| created_at | datetime |
+| مسئولیت | ثبت امتیاز و نظر مشتری درباره متخصص |
+| ویژگی‌ها | id, customer_id, specialist_id, request_id, rating, comment, created_at |
+| متدها | submitReview(), updateReview() |
+| روابط | ارتباط با Customer، Specialist و ServiceRequest |
 
-### ۲.۸ AvailabilitySlot
-| ویژگی | نوع |
+## AvailabilitySlot
+| بخش | توضیح |
 |---|---|
-| id | int |
-| specialist_id | int |
-| start_time | datetime |
-| end_time | datetime |
-| is_available | bool |
-
-### ۲.۹ RequestStatus (enum)
-| مقدار | توضیح |
-|---|---|
-| PENDING | در انتظار پاسخ متخصص |
-| ACCEPTED | پذیرفته‌شده |
-| REJECTED | ردشده |
-| COMPLETED | تکمیل‌شده |
-| CANCELLED | لغوشده |
-
-## ۳. روابط
-
-- `User` ← `Customer` (ارث‌بری)
-- `User` ← `Specialist` (ارث‌بری)
-- `User` ← `Admin` (ارث‌بری)
-- `Customer 1:N ServiceRequest`
-- `Specialist 1:N ServiceRequest`
-- `ServiceCategory 1:N ServiceRequest`
-- `Customer 1:N Review`
-- `Specialist 1:N Review`
-- `ServiceRequest 1:0..1 Review`
-- `Specialist 1:N AvailabilitySlot`
-- `Specialist N:M ServiceCategory`
-
-نکته: `specialist_id` در درخواست می‌تواند خالی باشد؛ چون درخواست ممکن است هنوز به متخصصی تخصیص داده نشده باشد. `RequestStatus` نیز یک `enum` است، نه یک کلاس معمولی.
+| مسئولیت | ثبت زمان‌های در دسترس بودن متخصص |
+| ویژگی‌ها | id, specialist_id, start_time, end_time, is_available |
+| متدها | addSlot(), updateSlot(), removeSlot() |
+| روابط | AvailabilitySlot N:1 Specialist |
