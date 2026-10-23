@@ -1,108 +1,39 @@
-
-# Class Diagram — ورکینو
+# Sequence Diagram — ورکینو
 
 ## ۱. مقدمه
 
-این دیاگرام کلاس‌های اصلی سیستم ورکینو، ویژگی‌های آن‌ها و روابط بین آن‌ها را نشان می‌دهد.
+این دیاگرام ترتیب تعاملات بین اجزا را در سناریوهای اصلی نشان می‌دهد.
 
-## ۲. کلاس‌ها
+## ۲. سناریو: ثبت درخواست خدمات
 
-### ۲.۱ Customer
+### ۲.۱ Actors
+- **مشتری** — کاربر
+- **Frontend** — رابط کاربری
+- **Backend** — پردازش درخواست‌ها
+- **Database** — پایگاه داده
 
-| ویژگی | نوع |
-|---|---|
-| id | int |
-| full_name | string |
-| email | string |
-| phone | string |
-| password_hash | string |
-| address | string |
-| is_active | bool |
+### ۲.۲ ترتیب
 
-### ۲.۲ Specialist
+1. مشتری روی «ثبت درخواست» کلیک می‌کند.
+2. Frontend درخواست `POST` به `/api/requests` می‌فرستد.
+3. Backend درخواست را اعتبارسنجی می‌کند.
+4. Backend اطلاعات را در Database ذخیره می‌کند.
+5. Backend شناسهٔ درخواست را برمی‌گرداند.
+6. Frontend پیام موفقیت نشان می‌دهد.
 
-| ویژگی | نوع |
-|---|---|
-| id | int |
-| full_name | string |
-| email | string |
-| phone | string |
-| password_hash | string |
-| bio | string |
-| skills | string |
-| service_area | string |
-| estimated_rate | decimal |
-| is_active | bool |
+## ۳. سناریو: مشاهدهٔ متخصصان
 
-### ۲.۳ Admin
+1. مشتری وارد صفحهٔ متخصصان می‌شود.
+2. Frontend درخواست `GET` به `/api/specialists` می‌فرستد.
+3. Backend فهرست متخصصان را از Database می‌خواند.
+4. Backend فهرست را برمی‌گرداند.
+5. Frontend نمایش می‌دهد.
 
-| ویژگی | نوع |
-|---|---|
-| id | int |
-| full_name | string |
-| email | string |
-| password_hash | string |
-| is_active | bool |
+## ۴. خطاهای ممکن
 
-### ۲.۴ ServiceCategory
-
-| ویژگی | نوع |
-|---|---|
-| id | int |
-| name | string |
-| description | string |
-
-### ۲.۵ ServiceRequest
-
-| ویژگی | نوع |
-|---|---|
-| id | int |
-| customer_id | int |
-| specialist_id | int (nullable) |
-| category_id | int |
-| description | string |
-| location | string |
-| budget | decimal |
-| requested_at | datetime |
-| status | RequestStatus (enum) |
-
-مقادیر مجاز وضعیت درخواست:
-
-- `PENDING` — در انتظار پاسخ متخصص
-- `ACCEPTED` — پذیرفته‌شده
-- `REJECTED` — ردشده
-- `COMPLETED` — تکمیل‌شده
-- `CANCELLED` — لغوشده
-
-### ۲.۶ Review
-
-| ویژگی | نوع |
-|---|---|
-| id | int |
-| customer_id | int |
-| specialist_id | int |
-| request_id | int |
-| rating | int |
-| comment | string |
-| created_at | datetime |
-
-### ۲.۷ AvailabilitySlot
-
-| ویژگی | نوع |
-|---|---|
-| id | int |
-| specialist_id | int |
-| start_time | datetime |
-| end_time | datetime |
-| is_available | bool |
-
-## ۳. روابط
-
-- `Customer 1:N ServiceRequest` — هر مشتری می‌تواند چند درخواست ثبت کند؛ هر درخواست متعلق به یک مشتری است.
-- `Specialist 1:N ServiceRequest` — هر متخصص می‌تواند چند درخواست دریافت کند؛ تخصیص متخصص به درخواست اختیاری است.
-- `ServiceCategory 1:N ServiceRequest` — هر دسته‌بندی می‌تواند چند درخواست داشته باشد؛ هر درخواست متعلق به یک دسته‌بندی است.
-- `Customer 1:N Review` — هر مشتری می‌تواند چند نظر ثبت کند؛ هر نظر توسط یک مشتری ثبت می‌شود.
-- `Specialist 1:N Review` — هر متخصص می‌تواند چند نظر دریافت کند؛ هر نظر درباره‌ی یک متخصص است.
-- `ServiceRequest 1:0..1 Review` — هر درخواست می‌تواند بدون نظر باشد یا حداکثر یک نظر داشته باشد.
-- `Specialist 1:N AvailabilitySlot` — هر متخصص می‌تواند چند بازه‌ی زمانی داشته باشد؛ هر بازه متعلق به یک متخصص است.
-- `Specialist N:M ServiceCategory` — هر متخصص می‌تواند در چند دسته‌بندی فعالیت کند و هر دسته‌بندی نیز می‌تواند چند متخصص داشته باشد.
+| خطا | کد | راهکار |
+|---|---|---|
+| اطلاعات نامعتبر است | 400 | پیام خطا |
+| کاربر وارد نشده است | 401 | هدایت به ورود |
+| متخصص پیدا نشد | 404 | پیام خطا |
+| خطای سرور | 500 | تلاش مجدد |
